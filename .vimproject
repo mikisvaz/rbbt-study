@@ -1,0 +1,33 @@
+rbbt-study=/$PWD filter="*.rb *.rake Rakefile *.rdoc *.R *.sh *.js *.haml *.sass *.txt *.conf" {
+ Rakefile
+ README.rdoc
+ LICENSE.txt
+ bin=bin {
+ }
+ lib=lib {
+  rbbt=rbbt{
+   entities=entities{
+    study.rb
+    study=study{
+     genotypes.rb
+     genotypes=genotypes{
+      mutations.rb
+      genes.rb
+      enrichment.rb
+     }
+     
+     enrichment.rb
+     features.rb
+     genes.rb
+     mutations.rb
+     plots.rb
+     samples.rb
+    }
+   }
+  }
+ }
+ test=test {
+  helper.rb
+  test_rbbt-study.rb
+ }
+}
