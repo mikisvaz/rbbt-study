@@ -3,9 +3,52 @@ require 'rbbt/util/misc'
 
 require 'rbbt/entity'
 require 'rbbt/resource'
+require 'rbbt/workflow'
+
+require 'rbbt/entity/study/samples'
+
+module StudyWorkflow
+  extend Workflow
+
+  helper :study do 
+    @study
+  end
+
+  helper :dir do
+    study.dir
+  end
+
+  helper :organism do
+    study.metadata[:organism]
+  end
+end
 
 module Study
   extend Entity
+  extend Resource
+
+  def job(task, *args)
+    name, inputs = args
+    if inputs.nil? and Hash === name
+      inputs = name
+      name = nil
+    end
+    name = self if name.nil? or name == :self or name == "self"
+    step = StudyWorkflow.job(task, name, {:organism => metadata[:organism], :watson => metadata[:watson]}.merge(inputs))
+    step.instance_variable_set(:@study, self)
+    step
+  end
+
+  def self.annotation_repo
+    @annotation_repo ||= Rbbt.var.cache.annotation_repo.find
+  end
+
+  def self.extended(base)
+    setup_file = File.join(base.dir, 'setup.rb')
+    if File.exists? setup_file
+      base.instance_eval Open.read(setup_file), setup_file
+    end
+  end
 
   def self.study_dir
     @study_dir ||= begin
@@ -26,8 +69,13 @@ module Study
   end
 
   def dir
-    Path.setup(File.join(Study.study_dir, self))
+    if @dir.nil?
+      @dir = Path.setup(File.join(Study.study_dir, self))
+      @dir.resource = Study
+    end
+    @dir
   end
+
 
   def metadata
     dir["metadata.yaml"].yaml.extend IndiferentHash
@@ -38,49 +86,54 @@ module Study
   def organism
     @organism ||= metadata["organism"]
   end
-  
+
 end
 if __FILE__ == $0
   require 'rbbt/entity/study/genotypes'
+  require 'rbbt/entity/study/cnv'
+
+  Workflow.require_workflow "Expression"
+
+  module Sample
+    persist :gained_genes, :annotations, :annotation_repo => "var/cache/annotation_repo"
+  end
 
   YAML::ENGINE.yamler = 'syck' if defined? YAML::ENGINE and YAML::ENGINE.respond_to? :yamler
 
-  class G
-    attr_accessor :code, :format, :organism
-    def initialize code, format, organism
-      @code, @format, @organism = code, format, organism
-    end
-  end
-
   Workflow.require_workflow :enrichment.to_s
-  Study.persist :recurrent_genes, :annotations
-  s = Study.setup("bladder-preal")
 
-  recurrent = s.recurrent_genes
-  tsv = Enrichment.job(:enrichment, nil, :list => recurrent, :database => :nature).clean.run
-  ddd tsv.keys.annotations
-  ddd tsv.keys.info
+  Sample.persist :gained_genes, :annotations, :annotation_repo => Study.annotation_repo
 
-
-  exit
-  Misc.benchmark do
-    10_000.times do
-      G.new("SF3B1", "Associated Gene Name", "Hsa/jun2011")
+  s = Study.setup("Ovary-TCGA")
+  class << s
+    GENE_HASH = {:format => "Ensembl Gene ID", :organism => "Hsa/may2009"}
+    def gene_setup(g)
+      g = g.dup
+      g.extend Gene
+      Gene.setup_hash(g, GENE_HASH)
     end
   end
 
-  Misc.benchmark do
-    10_000.times do
-      Gene.setup("SF3B1", :format => "Associated Gene Name", :organism => "Hsa/jun2011")
+  counts = {}
+  s.samples.each do |sample|
+    next unless sample.has_cnvs?
+    puts sample
+
+    genes = nil
+    genes = sample.gained_genes.clean_annotations
+    genes.each do |gene|
+      counts[gene] ||= 0
+      counts[gene] += 1 
     end
   end
 
-  exit
+  sig = Signature.setup(counts)
 
-  Misc.profile(:min_percent => 1) do
-    10_000.times do
-      Gene.setup("SF3B1", :format => "Associated Gene Name", :organism => "Hsa/jun2011")
-      #Gene.setup("SF3B1", "Associated Gene Name", "Hsa/jun2011")
-    end
-  end
+  #Misc.profile(:min_percent => 0.1) do
+  #  puts counts.select{|k,c| c > 4 }.sort_by{|k,c| c}.collect{|k,v| k = s.gene_setup(k); [k, v] * ": "} * "\n"
+  #end
+  #Misc.profile(:min_percent => 0.1) do
+  #  puts counts.select{|k,c| c > 4 }.sort_by{|k,c| c}.collect{|k,v| k = s.gene_setup(k); [k.name, v] * ": "} * "\n"
+  #end
+   
 end

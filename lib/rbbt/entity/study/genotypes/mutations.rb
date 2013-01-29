@@ -6,12 +6,11 @@ module Study
   property :relevant_mutations do
     all_mutations = self.all_mutations
 
-    all_mutations.select{|m| m.relevant? }.
-      tap{|o| o.jobname = "Relevant mutations in #{ self }" }
+    all_mutations.select_by(:relevant?).tap{|o| o.jobname = "Relevant mutations in #{ self }" }
   end
 
   property :damaging_mutations do |*args|
-    relevant_mutations.select{|m| m.damaging?(*args) }.tap{|o| o.jobname = "Damaging mutations in #{ self }" }
+    relevant_mutations.select_by(:damaging?, *args).tap{|o| o.jobname = "Damaging mutations in #{ self }" }
   end
 
   property :mutations_altering_isoform_sequence do
@@ -21,7 +20,7 @@ module Study
   end
 
   property :mutations_affecting_splicing_sites do
-    relevant_mutations.select{|m| m.transcripts_with_affected_splicing.any? }.
+    relevant_mutations.select_by(:transcripts_with_affected_splicing){|ts| ts.any? }.
       tap{|o| o.jobname = "Mutations affecting splicing sites in #{ self }"}
   end
 

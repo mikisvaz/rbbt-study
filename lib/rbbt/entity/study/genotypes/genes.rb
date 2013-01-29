@@ -5,7 +5,7 @@ module Study
   end
 
   property :altered_isoforms => :single do
-    cohort.metagenotype.mutated_isoforms.compact.flatten.uniq.select{|mi| mi.consequence != "SYNONYMOUS"}
+    cohort.metagenotype.mutated_isoforms.compact.flatten.uniq.select_by(:consequence){|c| c != "SYNONYMOUS"}
   end
 
   property :genes_with_altered_isoform_sequence => :single do
@@ -13,7 +13,7 @@ module Study
   end
 
   property :damaged_isoforms => :single do |*args|
-    altered_isoforms.select{|m| m.damaged?(*args)}
+    altered_isoforms.select_by(:damaged?, *args)
   end
 
   property :genes_with_damaged_isoforms => :single do |*args|
@@ -41,7 +41,7 @@ module Study
         next unless relevant_mutations.include? mutation
         genes = []
         mis = mutation.mutated_isoforms
-        genes.concat mis.select{|mi| mi.consequence != "SYNONYMOUS"}.transcript.gene unless mis.nil?
+        genes.concat mis.select_by(:consequence){|c| c != "SYNONYMOUS"}.transcript.gene unless mis.nil? or mis.empty?
         genes.concat mutation.transcripts_with_affected_splicing.gene
         genes.uniq.each{|gene| samples_with_gene_affected[gene] ||= []; samples_with_gene_affected[gene] << genotype.jobname}
       end

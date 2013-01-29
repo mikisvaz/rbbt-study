@@ -6,22 +6,31 @@ rbbt-study=/$PWD filter="*.rb *.rake Rakefile *.rdoc *.R *.sh *.js *.haml *.sass
  }
  lib=lib {
   rbbt=rbbt{
-   entities=entities{
+   entity=entity{
     study.rb
     study=study{
+
+     samples.rb
+     samples_old.rb
+
      genotypes.rb
      genotypes=genotypes{
+      samples.rb
       mutations.rb
       genes.rb
       enrichment.rb
      }
-     
-     enrichment.rb
-     features.rb
-     genes.rb
-     mutations.rb
-     plots.rb
-     samples.rb
+
+     cnv.rb
+
+     #{{{
+      enrichment.rb
+      features.rb
+      genes.rb
+      mutations.rb
+      plots.rb
+      samples.rb
+     #}
     }
    }
   }

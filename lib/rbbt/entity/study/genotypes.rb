@@ -4,6 +4,12 @@ require 'rbbt/entity/study/genotypes/mutations'
 require 'rbbt/entity/study/genotypes/genes'
 require 'rbbt/entity/study/genotypes/enrichment'
 
+module StudyWorkflow
+  helper :organism do
+    study.metadata[:organism]
+  end
+end
+
 module Study
   def has_genotypes?
     dir.genotypes.exists?
