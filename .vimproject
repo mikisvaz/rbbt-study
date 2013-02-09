@@ -23,14 +23,12 @@ rbbt-study=/$PWD filter="*.rb *.rake Rakefile *.rdoc *.R *.sh *.js *.haml *.sass
 
      cnv.rb
 
-     #{{{
-      enrichment.rb
-      features.rb
-      genes.rb
-      mutations.rb
-      plots.rb
-      samples.rb
-     #}
+     enrichment.rb
+     features.rb
+     genes.rb
+     mutations.rb
+     plots.rb
+     samples.rb
     }
    }
   }

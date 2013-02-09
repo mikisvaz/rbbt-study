@@ -78,7 +78,11 @@ module Study
 
 
   def metadata
-    dir["metadata.yaml"].yaml.extend IndiferentHash
+    @metadata ||= (dir["metadata.yaml"].yaml.extend IndiferentHash)
+  end
+
+  def users
+    @users ||= metadata[:users] || []
   end
 
   #{{{ Attributes
@@ -104,6 +108,12 @@ if __FILE__ == $0
 
   Sample.persist :gained_genes, :annotations, :annotation_repo => Study.annotation_repo
 
+  s = Study.setup("bladder-preal")
+  Open.write('/home/mvazquezg/tmp/muts2', s.damaging_mutations * "\n")
+  exit
+  ddd s.damaging_mutations.damaged_genes.compact.flatten.uniq.length
+  ddd s.damaged_genes.compact.flatten.uniq.length
+  exit
   s = Study.setup("Ovary-TCGA")
   class << s
     GENE_HASH = {:format => "Ensembl Gene ID", :organism => "Hsa/may2009"}

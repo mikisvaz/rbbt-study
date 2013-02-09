@@ -10,7 +10,7 @@ module Study
   end
 
   property :damaging_mutations do |*args|
-    relevant_mutations.select_by(:damaging?, *args).tap{|o| o.jobname = "Damaging mutations in #{ self }" }
+    all_mutations.select_by(:damaging?, *args).tap{|o| o.jobname = "Damaging mutations in #{ self }" }
   end
 
   property :mutations_altering_isoform_sequence do
@@ -24,4 +24,7 @@ module Study
       tap{|o| o.jobname = "Mutations affecting splicing sites in #{ self }"}
   end
 
+  property :mutations_over_gene do |gene|
+    all_mutations.select_by(:genes){|genes| genes and genes.include? gene}
+  end
 end
