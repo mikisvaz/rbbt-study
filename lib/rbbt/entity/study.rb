@@ -27,6 +27,8 @@ module Study
   extend Entity
   extend Resource
 
+  attr_accessor :workflow
+
   def job(task, *args)
     name, inputs = args
     if inputs.nil? and Hash === name
@@ -34,9 +36,17 @@ module Study
       name = nil
     end
     name = self if name.nil? or name == :self or name == "self"
-    step = StudyWorkflow.job(task, name, {:organism => metadata[:organism], :watson => metadata[:watson]}.merge(inputs))
+    step = workflow.job(task, name, {:organism => metadata[:organism], :watson => metadata[:watson]}.merge(inputs || {}))
     step.instance_variable_set(:@study, self)
     step
+  end
+
+  def workflow(&block)
+    if block_given?
+      @workflow.instance_eval &block
+    else
+      @workflow
+    end
   end
 
   def self.annotation_repo
@@ -45,6 +55,7 @@ module Study
 
   def self.extended(base)
     setup_file = File.join(base.dir, 'setup.rb')
+    base.workflow = StudyWorkflow.clone
     if File.exists? setup_file
       base.instance_eval Open.read(setup_file), setup_file
     end
@@ -92,6 +103,7 @@ module Study
   end
 
 end
+
 if __FILE__ == $0
   require 'rbbt/entity/study/genotypes'
   require 'rbbt/entity/study/cnv'
@@ -109,6 +121,19 @@ if __FILE__ == $0
   Sample.persist :gained_genes, :annotations, :annotation_repo => Study.annotation_repo
 
   s = Study.setup("bladder-preal")
+
+  ddd Resource === s.dir
+  exit
+
+  puts s.job(:oncodriveFM).run
+  exit
+
+  puts s.job(:salute, {}).run
+
+  s = Study.setup("bladder-preal")
+  puts s.job(:salute, {}).run
+
+  exit
   Open.write('/home/mvazquezg/tmp/muts2', s.damaging_mutations * "\n")
   exit
   ddd s.damaging_mutations.damaged_genes.compact.flatten.uniq.length
