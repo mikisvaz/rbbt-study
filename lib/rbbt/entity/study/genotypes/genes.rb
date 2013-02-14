@@ -5,7 +5,7 @@ module Study
   end
 
   property :altered_isoforms => :single do
-    cohort.metagenotype.mutated_isoforms.compact.flatten.uniq.select_by(:consequence){|c| c != "SYNONYMOUS"}
+    cohort.metagenotype.subset(relevant_mutations).mutated_isoforms.compact.flatten.uniq.select_by(:consequence){|c| c != "SYNONYMOUS"}
   end
 
   property :genes_with_altered_isoform_sequence => :single do
@@ -47,6 +47,26 @@ module Study
       end
     end
     samples_with_gene_affected
+  end
+
+  property :gene_sample_matrix => :single do
+    tsv = TSV.setup({}, :key_field => "Ensembl Gene ID", :namespace => organism, :type => :list)
+    samples = []
+    i = 0
+    num_samples = cohort.length
+    cohort.each do |genotype|
+      sample = genotype.jobname
+      genotype.subset(relevant_mutations).affected_genes.compact.flatten.uniq.each do |gene|
+        tsv[gene] ||= ["FALSE"] * num_samples
+        tsv[gene][i] = "TRUE"
+      end
+      samples << sample
+      i += 1
+    end
+
+    tsv.fields = samples
+
+    tsv
   end
 
   property :recurrent_genes => :single do |*args|

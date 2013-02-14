@@ -1,5 +1,7 @@
 require 'rbbt/entity/cnv'
 
+require 'rbbt/entity/study/cnv/samples'
+
 module StudyWorkflow
   helper :organism do
     study.metadata[:organism]
@@ -28,33 +30,6 @@ module Study
     end
     @cnv_cohort
   end
-end
-
-module Sample
-  property :cnvs => :array2single do
-    study.cnv_cohort
-  end
-
-  property :has_cnvs? => :array2single do
-    study.cnv_cohort.values_at(*self).collect{|cnvs| not cnvs.nil?}
-  end
-  
-  property :gained_cnvs => :single do
-    cnvs.select_by(:gain?)
-  end
- 
-  property :lost_cnvs => :single do
-    cnvs.select_by(:loss?)
-  end
-
-  property :gained_genes => :single do
-    gained_cnvs.genes.flatten.uniq
-  end
-
-  property :lost_genes => :single do
-    lost_cnvs.genes.flatten.uniq
-  end
-
 end
 
 module Study
@@ -93,4 +68,63 @@ module Study
     recurrent = counts.select{|k,c| c >= threshold }.collect{|k,v| k }
     Gene.setup(recurrent, "Ensembl Gene ID", organism)
   end
+
+  property :gene_sample_cnv_matrix => :single do
+    tsv = TSV.setup({}, :key_field => "Ensembl Gene ID", :namespace => organism, :type => :list)
+    samples = []
+    i = 0
+    num_samples = cohort.length
+    cnv_cohort.each do |sample,cnvs|
+      cnvs.genes.compact.flatten.uniq.each do |gene|
+        tsv[gene] ||= ["FALSE"] * num_samples
+        tsv[gene][i] = "TRUE"
+      end
+      samples << sample
+      i += 1
+    end
+
+    tsv.fields = samples
+
+    tsv
+  end
+
+  property :gene_sample_gain_matrix => :single do
+    tsv = TSV.setup({}, :key_field => "Ensembl Gene ID", :namespace => organism, :type => :list)
+    samples = []
+    i = 0
+    num_samples = cohort.length
+    cnv_cohort.each do |sample,cnvs|
+      cnvs.select_by(:gain?).genes.compact.flatten.uniq.each do |gene|
+        tsv[gene] ||= ["FALSE"] * num_samples
+        tsv[gene][i] = "TRUE"
+      end
+      samples << sample
+      i += 1
+    end
+
+    tsv.fields = samples
+
+    tsv
+  end
+
+
+  property :gene_sample_loss_matrix => :single do
+    tsv = TSV.setup({}, :key_field => "Ensembl Gene ID", :namespace => organism, :type => :list)
+    samples = []
+    i = 0
+    num_samples = cohort.length
+    cnv_cohort.each do |sample,cnvs|
+      cnvs.select_by(:loss?).genes.compact.flatten.uniq.each do |gene|
+        tsv[gene] ||= ["FALSE"] * num_samples
+        tsv[gene][i] = "TRUE"
+      end
+      samples << sample
+      i += 1
+    end
+
+    tsv.fields = samples
+
+    tsv
+  end
+
 end

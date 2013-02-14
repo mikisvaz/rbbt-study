@@ -22,6 +22,9 @@ rbbt-study=/$PWD filter="*.rb *.rake Rakefile *.rdoc *.R *.sh *.js *.haml *.sass
      }
 
      cnv.rb
+     cnv=cnv{
+      samples.rb
+     }
 
      enrichment.rb
      features.rb

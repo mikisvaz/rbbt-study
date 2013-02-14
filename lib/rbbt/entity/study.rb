@@ -102,6 +102,10 @@ module Study
     @organism ||= metadata["organism"]
   end
 
+  def matrix_file(name)
+    dir.matrices[name.to_s].find
+  end
+
 end
 
 if __FILE__ == $0

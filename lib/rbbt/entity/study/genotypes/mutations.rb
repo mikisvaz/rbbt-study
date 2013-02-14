@@ -10,7 +10,7 @@ module Study
   end
 
   property :damaging_mutations do |*args|
-    all_mutations.select_by(:damaging?, *args).tap{|o| o.jobname = "Damaging mutations in #{ self }" }
+    relevant_mutations.select_by(:damaging?, *args).tap{|o| o.jobname = "Damaging mutations in #{ self }" }
   end
 
   property :mutations_altering_isoform_sequence do
