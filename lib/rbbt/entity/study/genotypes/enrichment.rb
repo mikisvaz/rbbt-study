@@ -6,12 +6,11 @@ module StudyWorkflow
   #{{{ SAMPLE ENRICHMENT
   input :database, :string
   input :mutation_subset, :select, "Mutation subset to use", :relevant_mutations
-  input :baseline, :select, "Type of baseline to use", :bases, :select_options => [:pathway_base_counts, :pathway_gene_counts]
+  input :baseline, :select, "Type of baseline to use", :pathway_base_counts, :select_options => [:pathway_base_counts, :pathway_gene_counts]
   input :permutations, :integer, "Number of permutations in test", 10000
   input :fdr, :boolean, "BH FDR corrections", true
   input :masked_genes, :array, "Ensembl Gene ID list of genes to mask", []
-  input :organism, :string, "Organism code"
-  task :sample_pathway_enrichment => :tsv do |database,mutation_subset,baseline,permutations,fdr,masked_genes,organism|
+  task :sample_pathway_enrichment => :tsv do |database,mutation_subset,baseline,permutations,fdr,masked_genes|
 
     mutations = study.send(mutation_subset)
 
@@ -28,7 +27,7 @@ module StudyWorkflow
 
     job = MutationEnrichment.job(:sample_pathway_enrichment, study, 
                                  :mutations => mutation_tsv, :database => database, :baseline => baseline, :fdr => fdr, 
-                                 :masked_genes => masked_genes, :organism => organism, :permutations => permutations)
+                                 :masked_genes => masked_genes, :organism => study.organism, :permutations => permutations)
 
     res = job.run
     set_info :total_covered, job.info[:total_covered]
@@ -42,14 +41,13 @@ module StudyWorkflow
   input :baseline, :select, "Type of baseline to use", :pathway_base_counts, :select_options => [:pathway_base_counts, :pathway_gene_counts]
   input :fdr, :boolean, "BH FDR corrections", true
   input :masked_genes, :array, "Ensembl Gene ID list of genes to mask", []
-  input :organism, :string, "Organism code"
   task :mutation_pathway_enrichment => :tsv do |database,mutation_subset,baseline,fdr,masked_genes,organism|
 
     mutations = study.send(mutation_subset)
 
     job = MutationEnrichment.job(:mutation_pathway_enrichment, study, 
                                  :mutations => mutations, :database => database, :baseline => baseline, :fdr => fdr, 
-                                 :masked_genes => masked_genes, :organism => organism)
+                                 :masked_genes => masked_genes, :organism => study.organism)
     res = job.run
     set_info :total_covered, job.info[:total_covered]
     set_info :covered_mutations, job.info[:covered_mutations]
