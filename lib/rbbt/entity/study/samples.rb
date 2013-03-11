@@ -2,6 +2,17 @@ module Sample
   extend Entity
 
   annotation :study
+
+  def dir
+    return nil if study.nil?
+    return study.dir if study.respond_to? :dir
+    begin
+      Study.setup(study).dir
+    rescue
+      Log.warn "Error accessing sample dir from study: #{$!.message}"
+      nil
+    end
+  end
 end
 
 module Study

@@ -6,6 +6,7 @@ require 'rbbt/resource'
 require 'rbbt/workflow'
 
 require 'rbbt/entity/study/samples'
+require 'rbbt/expression/matrix'
 
 module StudyWorkflow
   extend Workflow
@@ -106,6 +107,23 @@ module Study
     dir.matrices[name.to_s].find
   end
 
+  def matrices
+    dir.matrices.glob('*').collect{|f| f.basename}
+  end
+
+  def matrix(type, format = "Ensembl Gene ID", organism = nil)
+    organism = self.metadata[:organism] if organism.nil?
+    raise "No matrices defined for study #{ self }" unless defined? matrices.empty?
+    raise "No type specified" if type.nil?
+    type = type.to_s
+    raise "No matrix #{ type } defined for study #{ self }" unless matrices.include? type
+    data = dir.matrices[type].data.find if dir.matrices[type].data.exists?
+    identifiers = dir.matrices[type].identifiers.find if dir.matrices[type].identifiers.exists?
+    samples = dir.matrices[type].samples.find if dir.matrices[type].samples.exists?
+    samples = dir.samples.find if samples.nil? and dir.samples.exist?
+    Matrix.new(data, identifiers, samples, format, organism)
+  end
+
 end
 
 if __FILE__ == $0
@@ -126,7 +144,7 @@ if __FILE__ == $0
 
   s = Study.setup("bladder-preal")
 
-  ddd Resource === s.dir
+  ddd Path === s.samples.first.dir
   exit
 
   puts s.job(:oncodriveFM).run
