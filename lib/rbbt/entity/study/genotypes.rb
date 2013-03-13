@@ -4,7 +4,6 @@ require 'rbbt/entity/study/genotypes/samples'
 require 'rbbt/entity/study/genotypes/mutations'
 require 'rbbt/entity/study/genotypes/genes'
 require 'rbbt/entity/study/genotypes/enrichment'
-require 'rbbt/entity/study/genotypes/oncodriveFM'
 
 module StudyWorkflow
   helper :organism do

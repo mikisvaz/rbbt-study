@@ -15,10 +15,10 @@ rbbt-study=/$PWD filter="*.rb *.rake Rakefile *.rdoc *.R *.sh *.js *.haml *.sass
 
      genotypes.rb
      genotypes=genotypes{
-      samples.rb
-      mutations.rb
-      genes.rb
       enrichment.rb
+      genes.rb
+      mutations.rb
+      samples.rb
      }
 
      cnv.rb
