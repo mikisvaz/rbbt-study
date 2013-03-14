@@ -27,4 +27,8 @@ module Study
   property :mutations_over_gene do |gene|
     all_mutations.select_by(:genes){|genes| genes and genes.include? gene}
   end
+
+  property :mutations_over_gene_list do |list|
+    all_mutations.select_by(:genes){|genes| genes and (genes & list).any?}
+  end
 end
