@@ -28,7 +28,7 @@ module Study
   extend Entity
   extend Resource
 
-  attr_accessor :workflow
+  attr_accessor :workflow, :dir
 
   def job(task, *args)
     name, inputs = args
