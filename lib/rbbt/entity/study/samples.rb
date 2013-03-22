@@ -18,7 +18,7 @@ end
 module Study
 
   def sample_info
-    @sample_info ||= dir.samples.tsv
+    @sample_info ||= dir.samples.tsv.tap{|tsv| tsv.entity_options = {:study => self }}
   end
 
   def samples
