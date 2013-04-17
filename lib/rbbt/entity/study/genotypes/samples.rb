@@ -8,7 +8,6 @@ module Sample
   property :affected_genes do
     mutations.affected_genes.compact.flatten.uniq
   end
-
 end
 
 

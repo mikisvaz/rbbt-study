@@ -54,9 +54,10 @@ module Study
     samples = []
     i = 0
     num_samples = cohort.length
+
     cohort.each do |genotype|
       sample = genotype.jobname
-      genotype.subset(relevant_mutations).affected_genes.compact.flatten.uniq.each do |gene|
+      genotype.affected_genes.compact.flatten.uniq.each do |gene|
         tsv[gene] ||= ["FALSE"] * num_samples
         tsv[gene][i] = "TRUE"
       end

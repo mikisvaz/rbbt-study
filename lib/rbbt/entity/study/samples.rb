@@ -3,6 +3,8 @@ module Sample
 
   annotation :study
 
+  self.format = ["Sample ID"]
+
   def dir
     return nil if study.nil?
     return study.dir if study.respond_to? :dir
