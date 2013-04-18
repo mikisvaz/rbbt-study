@@ -32,6 +32,24 @@ module Study
     Gene.setup((genes_with_damaged_isoforms(*args) + genes_with_affected_splicing_sites).uniq, "Ensembl Gene ID", organism)
   end
 
+ property :samples_with_gene_damaged => :single do
+    damaging_mutations= self.damaging_mutations
+
+    samples_with_gene_damaged = {}
+    cohort.each do |genotype|
+      genotype.each do |mutation|
+        next unless damaging_mutations.include? mutation
+        genes = []
+        mis = mutation.mutated_isoforms
+        genes.concat mis.select_by(:damaged?).transcript.gene unless mis.nil? or mis.empty?
+        genes.concat mutation.transcripts_with_affected_splicing.gene
+        genes.uniq.each{|gene| samples_with_gene_damaged[gene] ||= []; samples_with_gene_damaged[gene] << genotype.jobname}
+      end
+    end
+    samples_with_gene_damaged
+  end
+
+
   property :samples_with_gene_affected => :single do
     relevant_mutations = self.relevant_mutations
 
