@@ -24,7 +24,7 @@ module Study
         sample = File.basename(f)
         Sample.setup(sample, self)
         cnvs = Open.read(f).split("\n").sort
-        CNV.setup(cnvs , sample, organism)
+        CNV.setup(cnvs, organism)
         @cnv_cohort[sample] =  cnvs
       end
     end
@@ -126,5 +126,4 @@ module Study
 
     tsv
   end
-
 end

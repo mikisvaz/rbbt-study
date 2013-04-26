@@ -26,6 +26,11 @@ rbbt-study=/$PWD filter="*.rb *.rake Rakefile *.rdoc *.R *.sh *.js *.haml *.sass
       samples.rb
      }
 
+     methylation.rb
+     methylation=methylation{
+      samples.rb
+     }
+
      enrichment.rb
      features.rb
      genes.rb

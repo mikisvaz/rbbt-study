@@ -15,11 +15,16 @@ module Sample
       nil
     end
   end
+
+  def organism
+    study.organism
+  end
 end
 
 module Study
 
   def sample_info
+    return nil unless dir.samples.exists?
     @sample_info ||= dir.samples.tsv.tap{|tsv| tsv.entity_options = {:study => self }}
   end
 
