@@ -5,19 +5,27 @@ module Study
   end
 
   property :altered_isoforms => :single do
-    cohort.metagenotype.subset(relevant_mutations).mutated_isoforms.compact.flatten.uniq.select_by(:consequence){|c| c != "SYNONYMOUS"}
+    mutated_isoforms = cohort.metagenotype.subset(relevant_mutations).mutated_isoforms.compact.flatten.uniq
+    return [] if mutated_isoforms.empty?
+    mutated_isoforms.select_by(:consequence){|c| c != "SYNONYMOUS"}
   end
 
   property :genes_with_altered_isoform_sequence => :single do
+    altered_isoforms = self.altered_isoforms
+    return [] if altered_isoforms.empty?
     altered_isoforms.transcript.compact.gene.uniq
   end
 
   property :damaged_isoforms => :single do |*args|
+    altered_isoforms = self.altered_isoforms
+    return [] if altered_isoforms.empty?
     altered_isoforms.select_by(:damaged?, *args)
   end
 
   property :genes_with_damaged_isoforms => :single do |*args|
-    damaged_isoforms(*args).transcript.gene.uniq
+    damaged_isoforms = damaged_isoforms(*args)
+    return [] if damaged_isoforms.empty?
+    damaged_isoforms.transcript.gene.uniq
   end
 
   property :genes_with_affected_splicing_sites => :single do
