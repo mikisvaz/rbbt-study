@@ -27,6 +27,8 @@ end
 module Study
   extend Entity
   extend Resource
+  include LocalPersist
+
 
   attr_accessor :workflow, :dir
 
@@ -60,6 +62,7 @@ module Study
     if File.exists? setup_file
       base.instance_eval Open.read(setup_file), setup_file
     end
+    base.local_persist_dir = base.dir.var.cache.persistence.find
   end
 
   def self.study_dir
@@ -87,7 +90,6 @@ module Study
     end
     @dir
   end
-
 
   def metadata
     @metadata ||= (dir["metadata.yaml"].yaml.extend IndiferentHash)
@@ -123,5 +125,4 @@ module Study
     samples = dir.samples.find if samples.nil? and dir.samples.exist?
     Matrix.new(data, identifiers, samples, format, organism)
   end
-
 end

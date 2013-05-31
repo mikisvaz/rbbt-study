@@ -3,7 +3,7 @@ module Sample
     study.cnv_cohort
   end
 
-  property :has_cnvs? => :array2single do
+  property :has_cnv? => :array2single do
     study.cnv_cohort.values_at(*self).collect{|cnvs| not cnvs.nil?}
   end
   

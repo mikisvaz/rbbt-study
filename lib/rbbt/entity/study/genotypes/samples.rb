@@ -8,6 +8,15 @@ module Sample
     study.cohort[self]
   end
 
+  property :relevant_mutations do
+    mutations.select_by(:relevant?)
+  end
+
+  property :damaging_mutations do |*args|
+    mutations.select_by(:damaging?, *args)
+  end
+
+
   property :affected_genes do
     mutations.affected_genes.compact.flatten.uniq
   end
