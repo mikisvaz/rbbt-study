@@ -57,7 +57,6 @@ module Study
     samples_with_gene_damaged
   end
 
-
   property :samples_with_gene_affected => :single do
     relevant_mutations = self.relevant_mutations
 
@@ -75,7 +74,7 @@ module Study
     samples_with_gene_affected
   end
 
-  property :gene_sample_matrix => :single do
+  property :__gene_sample_matrix => :single do
     tsv = TSV.setup({}, :key_field => "Ensembl Gene ID", :namespace => organism, :type => :list)
     samples = []
     i = 0
@@ -89,6 +88,24 @@ module Study
       end
       samples << sample
       i += 1
+    end
+
+    tsv.fields = samples
+
+    tsv
+  end
+
+  property :gene_sample_matrix => :single do
+    genotyped_samples = samples.select{|s| s.has_genotype?}.sort
+
+    tsv = TSV.setup({}, :key_field => "Ensembl Gene ID", :namespace => organism, :type => :list, :fields => genotyped_samples)
+
+    num_samples = genotyped_samples.length
+    genotyped_samples.each_with_index do |sample,i|
+      sample.affected_genes.each do |gene|
+        tsv[gene] ||= [false] * num_samples
+        tsv[gene][i] = true
+      end
     end
 
     tsv.fields = samples

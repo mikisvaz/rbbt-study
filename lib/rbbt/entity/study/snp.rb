@@ -71,7 +71,17 @@ module Study
   end
 
   property :samples_with_snp => :single2array do |snp|
-    snp_index[snp]
-    snp_cohort.select{|sample, snps| snps.include? snp}.keys
+    Sample.setup((snp_index[snp] || []).collect{|s| s.split(":").first}, self)
   end
+
+  property :samples_with_homozygous_snp => :single2array do |snp|
+    Sample.setup((snp_index[snp] || []).collect{|s| s.split(":")}.select{|s,g| g == "2"}.collect{|s,g| s}, self)
+  end
+
+  property :samples_with_heterozygous_snp => :single2array do |snp|
+    Sample.setup((snp_index[snp] || []).collect{|s| s.split(":")}.select{|s,g| g == "1"}.collect{|s,g| s}, self)
+  end
+
+
+
 end

@@ -16,7 +16,6 @@ module Sample
     mutations.select_by(:damaging?, *args)
   end
 
-
   property :affected_genes do
     mutations.affected_genes.compact.flatten.uniq
   end
