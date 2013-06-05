@@ -96,19 +96,19 @@ module Study
   end
 
   property :gene_sample_matrix => :single do
-    genotyped_samples = samples.select{|s| s.has_genotype?}.sort
+    genotyped_samples = samples.select{|s| s.has_genotype?}.sort.uniq
 
     tsv = TSV.setup({}, :key_field => "Ensembl Gene ID", :namespace => organism, :type => :list, :fields => genotyped_samples)
 
     num_samples = genotyped_samples.length
     genotyped_samples.each_with_index do |sample,i|
-      sample.affected_genes.each do |gene|
-        tsv[gene] ||= [false] * num_samples
-        tsv[gene][i] = true
+      sample.affected_genes.clean_annotations.each do |gene|
+        tsv[gene] ||= ["FALSE"] * num_samples
+        tsv[gene][i] = "TRUE"
       end
     end
 
-    tsv.fields = samples
+    tsv.fields = genotyped_samples
 
     tsv
   end

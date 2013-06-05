@@ -19,6 +19,10 @@ module Sample
   property :affected_genes do
     mutations.affected_genes.compact.flatten.uniq
   end
+
+  property :damaged_genes do |*args|
+    mutations.damaged_genes(*args).compact.flatten.uniq
+  end
 end
 
 
