@@ -17,6 +17,7 @@ module Sample
   end
 
   def organism
+    return nil if study.nil?
     study.organism
   end
 end
