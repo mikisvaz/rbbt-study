@@ -102,7 +102,9 @@ module Study
 
     num_samples = genotyped_samples.length
     genotyped_samples.each_with_index do |sample,i|
-      sample.affected_genes.clean_annotations.each do |gene|
+      affected_genes = sample.affected_genes
+      next if affected_genes.empty?
+      affected_genes.clean_annotations.each do |gene|
         tsv[gene] ||= ["FALSE"] * num_samples
         tsv[gene][i] = "TRUE"
       end

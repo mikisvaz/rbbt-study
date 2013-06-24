@@ -11,6 +11,10 @@ require 'rbbt/expression/matrix'
 module StudyWorkflow
   extend Workflow
 
+  def self.workdir
+    @workdir ||= Rbbt.var.jobs["Study"].find
+  end
+
   helper :study do 
     @study
   end
