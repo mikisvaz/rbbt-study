@@ -124,7 +124,11 @@ module Study
     type = type.to_s
     raise "No matrix #{ type } defined for study #{ self }" unless matrices.include? type
     data = dir.matrices[type].data.find if dir.matrices[type].data.exists?
-    identifiers = dir.matrices[type].identifiers.find if dir.matrices[type].identifiers.exists?
+    if dir.matrices[type].identifiers.exists?
+      identifiers = dir.matrices[type].identifiers.find 
+    else
+      identifiers = Organism.identifiers(organism).find
+    end
     samples = dir.matrices[type].samples.find if dir.matrices[type].samples.exists?
     samples = dir.samples.find if samples.nil? and dir.samples.exist?
     Matrix.new(data, identifiers, samples, format, organism)
