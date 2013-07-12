@@ -5,6 +5,9 @@ require 'rbbt/entity'
 require 'rbbt/resource'
 require 'rbbt/workflow'
 
+Workflow.require_workflow "Genomics"
+
+require 'rbbt/entity/study'
 require 'rbbt/entity/study/samples'
 require 'rbbt/expression/matrix'
 

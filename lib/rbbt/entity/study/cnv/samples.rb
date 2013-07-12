@@ -6,6 +6,21 @@ module Sample
   property :has_cnv? => :array2single do
     study.cnv_cohort.values_at(*self).collect{|cnvs| not cnvs.nil?}
   end
+
+  property :gene_CN => :single do
+    gene_CN = {}
+    cnvs.variation.zip(cnvs.genes).each do |var, genes|
+      genes = genes.clean_annotations
+      case var
+      when "loss"
+        genes.each{|gene| gene_CN[gene] = "Lost"}
+      when "gain"
+        genes.each{|gene| gene_CN[gene] = "Gained"}
+      end
+    end
+    gene_CN
+  end
+  persist :gene_CN
   
   property :gained_cnvs => :single do
     return nil if cnvs.nil?
@@ -18,18 +33,16 @@ module Sample
     return [] if cnvs.empty?
     cnvs.select_by(:loss?)
   end
-
+  
   property :gained_genes => :single do
-    return nil if gained_cnvs.nil?
-    return [] if gained_cnvs.empty?
-    Gene.setup(gained_cnvs.genes.flatten.uniq, "Ensembl Gene ID", gained_cnvs.organism)
+    Gene.setup(gene_CN.select{|g,v| v == "Gained"}.collect{|g,v| g}, "Ensembl Gene ID", self.study.organism)
   end
+
 
   property :lost_genes => :single do
-    return nil if lost_cnvs.nil?
-    return [] if lost_cnvs.empty?
-    Gene.setup(lost_cnvs.genes.flatten.uniq, "Ensembl Gene ID", lost_cnvs.organism)
+    Gene.setup(gene_CN.select{|g,v| v == "Lost"}.collect{|g,v| g}, "Ensembl Gene ID", self.study.organism)
   end
+
 
   property :cnv_genes => :single do
     return nil if lost_genes.nil? or gained_genes.nil?

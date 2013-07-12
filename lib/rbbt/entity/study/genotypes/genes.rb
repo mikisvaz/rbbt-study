@@ -74,27 +74,6 @@ module Study
     samples_with_gene_affected
   end
 
-  property :__gene_sample_matrix => :single do
-    tsv = TSV.setup({}, :key_field => "Ensembl Gene ID", :namespace => organism, :type => :list)
-    samples = []
-    i = 0
-    num_samples = cohort.length
-
-    cohort.each do |genotype|
-      sample = genotype.jobname
-      genotype.affected_genes.compact.flatten.uniq.each do |gene|
-        tsv[gene] ||= ["FALSE"] * num_samples
-        tsv[gene][i] = "TRUE"
-      end
-      samples << sample
-      i += 1
-    end
-
-    tsv.fields = samples
-
-    tsv
-  end
-
   property :gene_sample_matrix => :single do
     genotyped_samples = samples.select{|s| s.has_genotype?}.sort.uniq
 

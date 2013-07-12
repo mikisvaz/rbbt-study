@@ -1,10 +1,51 @@
 require 'rbbt/entity/cnv'
 
+require 'rbbt/entity/study/cnv/genes'
 require 'rbbt/entity/study/cnv/samples'
 
 module StudyWorkflow
   helper :organism do
     study.metadata[:organism]
+  end
+
+  task :cnv_overview => :tsv do
+    gene_overview = TSV.setup({}, 
+                          :key_field => "Ensembl Gene ID", 
+                          :fields => ["Samples with gene lost", "Samples with gene gained"],
+                          :type => :double
+                         )
+
+    cnv_samples = study.samples.select_by(:has_cnv?)
+
+    log :samples, "Gathering affected samples"
+    samples_gene_status = {}
+    all_genes = []
+    cnv_samples.each do |sample|
+      samples_gene_status[sample] = {}
+
+      lost_genes = sample.lost_genes
+      lost_genes.clean_annotations.each do |gene|
+        samples_gene_status[sample][gene] ||= [false, false]
+        samples_gene_status[sample][gene][0] = true
+        all_genes << gene
+      end if lost_genes.any?
+
+      gained_genes = sample.gained_genes
+      gained_genes.clean_annotations.each do |gene|
+        samples_gene_status[sample][gene] ||= [false, false]
+        samples_gene_status[sample][gene][1] = true
+        all_genes << gene
+      end if gained_genes.any?
+    end
+
+    log :compiling, "Compiling result"
+    all_genes.uniq.sort.each do |gene|
+      gene_overview[gene] = []
+      gene_overview[gene] << samples_gene_status.select{|sample, gene_status| gene_status.include? gene and gene_status[gene][0]}.collect{|sample, gene_status| sample}
+      gene_overview[gene] << samples_gene_status.select{|sample, gene_status| gene_status.include? gene and gene_status[gene][1]}.collect{|sample, gene_status| sample} 
+    end
+
+    gene_overview
   end
 end
 
