@@ -14,6 +14,10 @@ require 'rbbt/expression/matrix'
 module StudyWorkflow
   extend Workflow
 
+  class << self
+    attr_accessor :study
+  end
+
   def self.workdir
     @workdir ||= Rbbt.var.jobs["Study"].find
   end
@@ -28,6 +32,10 @@ module StudyWorkflow
 
   helper :organism do
     study.metadata[:organism]
+  end
+
+  def self.job(*args)
+    super(*args).tap{|s| s.instance_variable_set("@study", @study) }
   end
 end
 
@@ -66,6 +74,7 @@ module Study
   def self.extended(base)
     setup_file = File.join(base.dir, 'setup.rb')
     base.workflow = StudyWorkflow.clone
+    base.workflow.study = base
     if File.exists? setup_file
       base.instance_eval Open.read(setup_file), setup_file
     end
