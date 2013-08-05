@@ -1,6 +1,6 @@
 #{{{ SAMPLE ENRICHMENT
 dep do |jobname, inputs| job(inputs[:mutation_subset] || :relevant_mutations, jobname, inputs) end
-input :database, :string
+input :database, :string, "Database code"
 input :mutation_subset, :select, "Mutation subset to use", :relevant_mutations
 input :baseline, :select, "Type of baseline to use", :bases, :select_options => [:pathway_base_counts, :pathway_gene_counts]
 input :permutations, :integer, "Number of permutations in test", 10000
@@ -34,7 +34,7 @@ end
 
 #{{{ METAGENOTYPE ENRICHMENT
 dep do |jobname, inputs| job(inputs[:mutation_subset] || :relevant_mutations, jobname, inputs) end
-input :database, :string
+input :database, :string, "Database code"
 input :mutation_subset, :select, "Mutation subset to use", :relevant_mutations
 input :baseline, :select, "Type of baseline to use", :pathway_base_counts, :select_options => [:pathway_base_counts, :pathway_gene_counts]
 input :fdr, :boolean, "BH FDR corrections", true

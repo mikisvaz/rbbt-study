@@ -45,4 +45,13 @@ module Study
   def has_mutations?
     study.cohort and study.cohort.include? self
   end
+
+  def match_samples(list)
+    if donor_id_field = (sample_info = self.sample_info).fields.select{|f| f =~ /donor\s+id/i}.first
+      list_donors = sample_info.select(list).slice(donor_id_field).values.compact.flatten
+      list_donor_samples = sample_info.select(list_donors).keys
+      list = list.annotate((list + list_donor_samples).uniq)
+    end
+    list
+  end
 end
