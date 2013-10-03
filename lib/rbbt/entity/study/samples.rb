@@ -50,7 +50,7 @@ module Study
     if donor_id_field = (sample_info = self.sample_info).fields.select{|f| f =~ /donor\s+id/i}.first
       list_donors = sample_info.select(list).slice(donor_id_field).values.compact.flatten
       list_donor_samples = sample_info.select(list_donors).keys
-      list = list.annotate((list + list_donor_samples).uniq)
+      list = list_donor_samples.annotate((list + list_donor_samples).uniq)
     end
     list
   end
