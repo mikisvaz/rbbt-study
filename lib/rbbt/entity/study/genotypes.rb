@@ -4,6 +4,7 @@ require 'rbbt/entity/study/genotypes/samples'
 require 'rbbt/entity/study/genotypes/mutations'
 require 'rbbt/entity/study/genotypes/genes'
 require 'rbbt/entity/study/genotypes/enrichment'
+require 'rbbt/entity/study/genotypes/knowledge_base'
 
 Workflow.require_workflow "NKIWorkflow"
 Workflow.require_workflow "TSVWorkflow"
@@ -37,7 +38,10 @@ module StudyWorkflow
       log :significance, "Computing mutation significance"
       mutation_significance = NKIWorkflow.job(:significantly_mutated, study, :study => study, :threshold => 0.1).run
       log :significance, "Reordering mutation significance file"
-      mutation_significance = TSVWorkflow.job(:change_id, study, :format => "Ensembl Gene ID", :tsv => mutation_significance).run
+
+      #TSVWorkflow.job(:change_id, study, :format => "Ensembl Gene ID", :tsv => mutation_significance).run
+      mutation_significance.identifiers = Organism.identifiers(study.organism)
+      mutation_significance = mutation_significance.change_key "Ensembl Gene ID" 
 
       log :samples, "Gathering affected samples"
       samples_gene_status = {}

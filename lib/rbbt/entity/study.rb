@@ -8,6 +8,7 @@ require 'rbbt/workflow'
 Workflow.require_workflow "Genomics"
 
 require 'rbbt/entity/study'
+require 'rbbt/entity/study/knowledge_base'
 require 'rbbt/entity/study/samples'
 require 'rbbt/expression/matrix'
 
@@ -44,6 +45,21 @@ module Study
   extend Resource
   include LocalPersist
 
+  class << self
+    attr_accessor :study_dir
+    def study_dir
+      @study_dir ||= begin
+                       case
+                       when (not defined?(Rbbt))
+                         File.join(ENV["HOME"], '.studies')
+                       when Rbbt.etc.study_dir.exists?
+                         Rbbt.etc.study_dir.read.chomp
+                       else
+                         Rbbt.studies.find
+                       end
+                     end
+    end
+  end
 
   attr_accessor :workflow, :dir
 
@@ -79,19 +95,6 @@ module Study
       base.instance_eval Open.read(setup_file), setup_file
     end
     base.local_persist_dir = base.dir.var.cache.persistence.find
-  end
-
-  def self.study_dir
-    @study_dir ||= begin
-                     case
-                     when (not defined?(Rbbt))
-                       File.join(ENV["HOME"], '.studies')
-                     when Rbbt.etc.study_dir.exists?
-                       Rbbt.etc.study_dir.read.chomp
-                     else
-                       Rbbt.studies.find
-                     end
-                   end
   end
 
   def self.studies

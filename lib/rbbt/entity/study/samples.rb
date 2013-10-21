@@ -31,7 +31,11 @@ module Study
 
   def samples
     if @samples.nil?
-      @samples = sample_info.keys
+      if sample_info.nil?
+        @samples = self.cohort.collect{|g| g.jobname }
+      else
+        @samples = sample_info.keys
+      end
       Sample.setup(@samples, self)
       @samples.study = self
     end

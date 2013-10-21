@@ -9,6 +9,7 @@ rbbt-study=/$PWD filter="*.rb *.rake Rakefile *.rdoc *.R *.sh *.js *.haml *.sass
    entity=entity{
     study.rb
     study=study{
+     knowledge_base.rb
 
      samples.rb
      samples_old.rb
@@ -19,6 +20,7 @@ rbbt-study=/$PWD filter="*.rb *.rake Rakefile *.rdoc *.R *.sh *.js *.haml *.sass
       genes.rb
       mutations.rb
       samples.rb
+      knowledge_base.rb
      }
 
      cnv.rb
