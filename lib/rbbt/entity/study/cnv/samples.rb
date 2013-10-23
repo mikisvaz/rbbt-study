@@ -10,6 +10,7 @@ module Sample
   property :gene_CN => :single do
     gene_CN = {}
     cnvs.variation.zip(cnvs.genes).each do |var, genes|
+      next if genes.empty?
       genes = genes.clean_annotations
       case var
       when "loss"
