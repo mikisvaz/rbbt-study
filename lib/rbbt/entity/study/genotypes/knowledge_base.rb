@@ -17,20 +17,29 @@ module Study
   }
 
   self.study_registry[:sample_genes] = Proc.new{|study,database|
-    tsv = TSV.setup({}, :key_field => "Sample", :fields => ["Ensembl Gene ID"], :type => :flat, :namespace => study.organism)
-    study.samples.select_by(:has_genotype?).each do |sample|
-      tsv[sample] = sample.affected_genes
-    end
-    tsv
-  }
+    tsv = TSV.setup({}, :key_field => "Sample", :fields => ["Ensembl Gene ID", "Genomic Mutation", "Affected isoform", "Damaged isoform", "Exon Junction"], :type => :double, :namespace => study.organism)
+    gene_mutations = study.knowledge_base.get_database(:mutation_genes, :source => "Ensembl Gene ID")
+    sample_mutations = study.knowledge_base.get_database(:sample_mutations, :source => "Sample")
 
-  self.study_registry[:sample_genes2] = Proc.new{|study,database|
-    tsv = TSV.setup({}, :key_field => "Sample", :fields => ["Ensembl Gene ID", "Genomic Mutation"], :type => :double, :namespace => study.organism)
-    kb = study.knowledge_base.get_database(:mutation_genes, :source => "Ensembl Gene ID")
-    study.samples.select_by(:has_genotype?).each do |sample|
+    require 'progress-monitor'
+    Progress.monitor "Mon", :stack_depth => 1
+    study.samples.select_by(:has_genotype?)[0..3].each do |sample|
       values = sample.affected_genes.collect do |gene|
-        [gene, kb[gene] * ";;"]
+        mutations = gene_mutations[gene].subset(sample_mutations[sample] || [])
+        if mutations.any?
+          junction = mutations.select_by(:in_exon_junction?).any?
+
+          mis = Annotated.flatten mutations.mutated_isoforms.compact
+
+          affected = (mis.any? and mis.select_by(:consequence){|c| ! %w(UTR SYNONYMOUS).include? c}.any?) 
+          damaged = (mis.any? and mis.select_by(:damaged?).any?) 
+
+          [gene, mutations * ";;", affected, damaged, junction]
+        else
+          [gene, "", false, false, false]
+        end
       end
+
       tsv[sample] = Misc.zip_fields values
     end
     tsv
