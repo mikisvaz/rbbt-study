@@ -21,18 +21,21 @@ module Study
     gene_mutations = study.knowledge_base.get_database(:mutation_genes, :source => "Ensembl Gene ID")
     sample_mutations = study.knowledge_base.get_database(:sample_mutations, :source => "Sample")
 
-    require 'progress-monitor'
-    Progress.monitor "Mon", :stack_depth => 1
-    study.samples.select_by(:has_genotype?)[0..3].each do |sample|
+    all_mutations = study.all_mutations
+    mutations2mutated_isoforms = Misc.process_to_hash(all_mutations){|mutations| mutations.mutated_isoforms }
+    mi2damaged = Misc.process_to_hash(MutatedIsoform.setup(mutations2mutated_isoforms.values.flatten.compact.uniq, study.organism)){|mis| mis.damaged? }
+    study.samples.select_by(:has_genotype?).each do |sample|
       values = sample.affected_genes.collect do |gene|
         mutations = gene_mutations[gene].subset(sample_mutations[sample] || [])
         if mutations.any?
           junction = mutations.select_by(:in_exon_junction?).any?
 
-          mis = Annotated.flatten mutations.mutated_isoforms.compact
+          mis = Annotated.flatten mutations2mutated_isoforms.values_at(*mutations).compact
 
           affected = (mis.any? and mis.select_by(:consequence){|c| ! %w(UTR SYNONYMOUS).include? c}.any?) 
-          damaged = (mis.any? and mis.select_by(:damaged?).any?) 
+          #damaged = (mis.any? and mis.select_by(:damaged?).any?) 
+          
+          damaged = (mis.any? and mis.select{|mi| mi2damaged[mi]  }.any?) 
 
           [gene, mutations * ";;", affected, damaged, junction]
         else
