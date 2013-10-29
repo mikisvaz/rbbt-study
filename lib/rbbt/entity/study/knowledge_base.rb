@@ -23,7 +23,6 @@ module Study
                             if Proc === file
                               study = self
                               block = Proc.new{ file.call(self, database) }
-                              block.define_singleton_method(:filename) do [database, study] * "@" end
                               kb.register database, nil, {}, &block 
                             else
                               kb.register database, file

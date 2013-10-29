@@ -20,6 +20,7 @@ module Sample
     return nil if study.nil?
     study.organism
   end
+
 end
 
 module Study
@@ -40,14 +41,6 @@ module Study
       @samples.study = self
     end
     @samples
-  end
-
-  def has_cnv?
-    study.has_cnv? and study.cnv_cohort.include? self
-  end
-  
-  def has_mutations?
-    study.cohort and study.cohort.include? self
   end
 
   def match_samples(list)
