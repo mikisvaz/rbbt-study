@@ -18,13 +18,15 @@ module Study
 
   self.study_registry[:sample_genes] = Proc.new{|study,database|
     tsv = TSV.setup({}, :key_field => "Sample", :fields => ["Ensembl Gene ID", "Genomic Mutation", "Affected isoform", "Damaged isoform", "Exon Junction"], :type => :double, :namespace => study.organism)
-    gene_mutations = study.knowledge_base.get_database(:mutation_genes, :source => "Ensembl Gene ID")
-    gene_mutations.entity_options["Genomic Mutation"] = {:watson => study.watson, :organism => study.organism}
-    sample_mutations = study.knowledge_base.get_database(:sample_mutations, :source => "Sample")
 
+    sample_mutations = study.knowledge_base.get_database(:sample_mutations, :source => "Sample")
     all_mutations = study.all_mutations
     mutations2mutated_isoforms = Misc.process_to_hash(all_mutations){|mutations| mutations.mutated_isoforms }
-    mi2damaged = Misc.process_to_hash(MutatedIsoform.setup(mutations2mutated_isoforms.values.flatten.compact.uniq, study.organism)){|mis| mis.damaged? }
+    #mi2damaged = Misc.process_to_hash(MutatedIsoform.setup(mutations2mutated_isoforms.values.flatten.compact.uniq, study.organism)){|mis| mis.damaged? }
+    mi2damaged = Misc.process_to_hash(MutatedIsoform.setup(mutations2mutated_isoforms.values.flatten.compact.uniq, study.organism)){|mis| [false] * mis.length }
+
+    gene_mutations = study.knowledge_base.get_database(:mutation_genes, :source => "Ensembl Gene ID")
+    gene_mutations.entity_options["Genomic Mutation"] = {:watson => study.watson, :organism => study.organism}
     study.samples.select_by(:has_genotype?).each do |sample|
       values = sample.affected_genes.collect do |gene|
         mutations = gene_mutations[gene].subset(sample_mutations[sample] || [])
