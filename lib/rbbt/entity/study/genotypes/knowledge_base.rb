@@ -21,24 +21,25 @@ module Study
 
     sample_mutations = study.knowledge_base.get_database(:sample_mutations, :source => "Sample")
     all_mutations = study.all_mutations
-    mutations2mutated_isoforms = Misc.process_to_hash(all_mutations){|mutations| mutations.mutated_isoforms }
+    mutations2mutated_isoforms = Misc.process_to_hash(all_mutations){|mutations| mutations.any? ? mutations.mutated_isoforms : [] }
     #mi2damaged = Misc.process_to_hash(MutatedIsoform.setup(mutations2mutated_isoforms.values.flatten.compact.uniq, study.organism)){|mis| mis.damaged? }
     mi2damaged = Misc.process_to_hash(MutatedIsoform.setup(mutations2mutated_isoforms.values.flatten.compact.uniq, study.organism)){|mis| [false] * mis.length }
+    mi2consequence = Misc.process_to_hash(MutatedIsoform.setup(mutations2mutated_isoforms.values.flatten.compact.uniq, study.organism)){|mis| mis.consequence }
 
     gene_mutations = study.knowledge_base.get_database(:mutation_genes, :source => "Ensembl Gene ID")
+    gene_mutations.unnamed = true
     gene_mutations.entity_options["Genomic Mutation"] = {:watson => study.watson, :organism => study.organism}
     study.samples.select_by(:has_genotype?).each do |sample|
       values = sample.affected_genes.collect do |gene|
-        mutations = gene_mutations[gene].subset(sample_mutations[sample] || [])
+        mutations = gene_mutations[gene] & (sample_mutations[sample] || [])
 
         if mutations.any?
+          GenomicMutation.setup(mutations, "Mutations in #{ sample } over #{ gene }", study.organism, study.watson)
           junction = mutations.select_by(:in_exon_junction?).any?
 
           mis = Annotated.flatten mutations2mutated_isoforms.values_at(*mutations).compact
 
-          affected = (mis.any? and mis.select_by(:consequence){|c| ! %w(UTR SYNONYMOUS).include? c}.any?) 
-          #damaged = (mis.any? and mis.select_by(:damaged?).any?) 
-          
+          affected = (mis.any? and mis.select{|mi| c = mi2consequence[mi]; ! %w(UTR SYNONYMOUS).include? c}.any?) 
           damaged = (mis.any? and mis.select{|mi| mi2damaged[mi]  }.any?) 
 
           [gene, mutations * ";;", affected, damaged, junction]
