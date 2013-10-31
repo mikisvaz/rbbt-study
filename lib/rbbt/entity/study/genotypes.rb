@@ -7,7 +7,6 @@ require 'rbbt/entity/study/genotypes/enrichment'
 require 'rbbt/entity/study/genotypes/knowledge_base'
 
 Workflow.require_workflow "NKIWorkflow"
-Workflow.require_workflow "TSVWorkflow"
 
 module StudyWorkflow
   helper :organism do
@@ -39,7 +38,6 @@ module StudyWorkflow
       mutation_significance = NKIWorkflow.job(:significantly_mutated, study, :study => study, :threshold => 0.1).run
       log :significance, "Reordering mutation significance file"
 
-      #TSVWorkflow.job(:change_id, study, :format => "Ensembl Gene ID", :tsv => mutation_significance).run
       mutation_significance.identifiers = Organism.identifiers(study.organism)
       mutation_significance = mutation_significance.change_key "Ensembl Gene ID" 
 
