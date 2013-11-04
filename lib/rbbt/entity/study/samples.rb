@@ -21,6 +21,13 @@ module Sample
     study.organism
   end
 
+  def study
+    @study ||= begin
+                 this = Array === self ? self.flatten : [self]
+                 Study.studies.select{|study| Study.setup(study); (study.samples & this).any? }.first
+               end
+  end
+
 end
 
 module Study

@@ -50,6 +50,7 @@ module Study
 
       tsv[sample] = Misc.zip_fields values
     end
+
     tsv
   }
 
