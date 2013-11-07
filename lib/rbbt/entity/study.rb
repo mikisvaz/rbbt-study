@@ -103,11 +103,7 @@ module Study
   end
 
   def dir
-    if @dir.nil?
-      @dir = Path.setup(File.join(Study.study_dir, self))
-      @dir.resource = Study
-    end
-    @dir
+    @dir ||= Path === Study.study_dir ? Study.study_dir[self] : Path.setup(File.join(Study.study_dir, self), nil, Study)
   end
 
   def metadata

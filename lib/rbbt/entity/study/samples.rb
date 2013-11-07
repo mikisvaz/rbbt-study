@@ -1,3 +1,6 @@
+module Study
+end
+
 module Sample
   extend Entity
 
@@ -23,8 +26,12 @@ module Sample
 
   def study
     @study ||= begin
-                 this = Array === self ? self.flatten : [self]
-                 Study.studies.select{|study| Study.setup(study); (study.samples & this).any? }.first
+                 study = info[:study] 
+                 if study.nil?
+                   study = Study.identify_study(self)
+                   self.study = study
+                 end
+                 study
                end
   end
 
@@ -38,16 +45,18 @@ module Study
   end
 
   def samples
-    if @samples.nil?
-      if sample_info.nil?
-        @samples = self.cohort.collect{|g| g.jobname }
-      else
-        @samples = sample_info.keys
-      end
-      Sample.setup(@samples, self)
-      @samples.study = self
-    end
-    @samples
+    @samples ||= begin
+                   samples = local_persist("Sample", :array) do
+                     if sample_info.nil?
+                       self.cohort.collect{|g| g.jobname }
+                     else
+                       sample_info.keys
+                     end
+                   end
+                   Sample.setup(samples, self)
+                   samples.study = self
+                   samples
+                 end
   end
 
   def match_samples(list)
@@ -57,5 +66,14 @@ module Study
       list = list_donor_samples.annotate((list + list_donor_samples).uniq)
     end
     list
+  end
+
+  def self.identify_study(samples)
+    samples = Array === samples ? samples.flatten : [samples]
+
+    studies = Study.studies.select{|study| Study.setup(study); (study.samples & samples).any? }
+    return nil if studies.length != 1
+
+    studies.first
   end
 end
