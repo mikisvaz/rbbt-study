@@ -94,7 +94,7 @@ module Study
     if File.exists? setup_file
       base.instance_eval Open.read(setup_file), setup_file
     end
-    base.local_persist_dir = base.dir.var.cache.persistence.find
+    base.local_persist_dir = Rbbt.var.cache.studies[base].persistence.find
   end
 
   def self.studies

@@ -1,3 +1,8 @@
+require 'rbbt/workflow'
+Workflow.require_workflow "Genomics"
+require 'rbbt/entity/gene'
+require 'rbbt/entity/genomic_mutation'
+
 module Study
 
   self.study_registry[:mutation_genes] = Proc.new{|study,database|

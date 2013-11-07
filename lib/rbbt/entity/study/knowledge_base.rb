@@ -15,7 +15,7 @@ module Study
 
   def knowledge_base
     @knowledge_base ||= begin 
-                          kb = KnowledgeBase.new(self.dir.var.knowledge_base, self.organism)
+                          kb = KnowledgeBase.new(Rbbt.var.knowledge_base.studies[self], self.organism)
                           kb.format["Gene"] = "Ensembl Gene ID"
                           kb.entity_options["Sample"] = {"Study" => self}
                           Study.study_registry.each do |database, file|
