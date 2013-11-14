@@ -17,6 +17,7 @@ Jeweler::Tasks.new do |gem|
 
   gem.files = Dir['lib/**/*.rb', 'share/**/*' ]
   # dependencies defined in Gemfile
+  gem.license = "MIT"
 end
 Jeweler::RubygemsDotOrgTasks.new
 

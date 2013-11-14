@@ -103,6 +103,6 @@ module Study
       name = File.basename(f)
       genomic_mutations = Open.read(f).split("\n").sort
       GenomicMutation.setup(genomic_mutations, name, organism, watson)
-    end.tap{|cohort| cohort.extend Genotype::Cohort}
+    end.tap{|cohort| cohort.extend Genotype::Cohort; cohort.organism ||= self.organism; cohort.watson ||= self.watson}
   end
 end
