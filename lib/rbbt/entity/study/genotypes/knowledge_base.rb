@@ -27,6 +27,7 @@ module Study
     sample_mutations = study.knowledge_base.get_database(:sample_mutations, :source => "Sample")
     all_mutations = study.all_mutations
     mutations2mutated_isoforms = Misc.process_to_hash(all_mutations){|mutations| mutations.any? ? mutations.mutated_isoforms : [] }
+    mutations2exon_junction = Misc.process_to_hash(all_mutations){|mutations| mutations.in_exon_junction? }
     #mi2damaged = Misc.process_to_hash(MutatedIsoform.setup(mutations2mutated_isoforms.values.flatten.compact.uniq, study.organism)){|mis| mis.damaged? }
     mi2damaged = Misc.process_to_hash(MutatedIsoform.setup(mutations2mutated_isoforms.values.flatten.compact.uniq, study.organism)){|mis| [false] * mis.length }
     mi2consequence = Misc.process_to_hash(MutatedIsoform.setup(mutations2mutated_isoforms.values.flatten.compact.uniq, study.organism)){|mis| mis.consequence }
@@ -40,7 +41,7 @@ module Study
 
         if mutations.any?
           GenomicMutation.setup(mutations, "Mutations in #{ sample } over #{ gene }", study.organism, study.watson)
-          junction = mutations.select_by(:in_exon_junction?).any?
+          junction = mutations.select{|mutation| mutations2exon_junction[mutation] }.any?
 
           mis = Annotated.flatten mutations2mutated_isoforms.values_at(*mutations).compact
 
