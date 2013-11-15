@@ -51,9 +51,9 @@ module Study
       @study_dir ||= begin
                        case
                        when (not defined?(Rbbt))
-                         File.join(ENV["HOME"], '.studies')
+                         Path.setup(File.join(ENV["HOME"], '.studies'))
                        when Rbbt.etc.study_dir.exists?
-                         Rbbt.etc.study_dir.read.chomp
+                         Path.setup(Rbbt.etc.study_dir.read.chomp)
                        else
                          Rbbt.studies.find
                        end
@@ -88,13 +88,16 @@ module Study
   end
 
   def self.extended(base)
-    setup_file = File.join(base.dir, 'setup.rb')
     base.workflow = StudyWorkflow.clone
     base.workflow.study = base
-    if File.exists? setup_file
+
+    if File.exists?(setup_file = File.join(base.dir, 'setup.rb'))
       base.instance_eval Open.read(setup_file), setup_file
     end
+
     base.local_persist_dir = Rbbt.var.cache.studies[base].persistence.find
+
+    base
   end
 
   def self.studies
@@ -103,7 +106,12 @@ module Study
   end
 
   def dir
-    @dir ||= Path === Study.study_dir ? Study.study_dir[self] : Path.setup(File.join(Study.study_dir, self), nil, Study)
+    @dir ||= if Path === Study.study_dir
+               Study.study_dir[self] 
+             else
+               Path.setup(File.join(Study.study_dir.dup, self), nil, Study)
+             end
+    @dir
   end
 
   def metadata

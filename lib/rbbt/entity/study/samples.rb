@@ -53,7 +53,7 @@ module Study
                        sample_info.keys
                      end
                    end
-                   Sample.setup(samples, self)
+                   Sample.setup(samples, :study => self)
                    samples.study = self
                    samples
                  end
