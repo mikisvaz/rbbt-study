@@ -28,8 +28,8 @@ module Study
     all_mutations = study.all_mutations
     mutations2mutated_isoforms = Misc.process_to_hash(all_mutations){|mutations| mutations.any? ? mutations.mutated_isoforms : [] }
     mutations2exon_junction = Misc.process_to_hash(all_mutations){|mutations| mutations.in_exon_junction? }
-    #mi2damaged = Misc.process_to_hash(MutatedIsoform.setup(mutations2mutated_isoforms.values.flatten.compact.uniq, study.organism)){|mis| mis.damaged? }
-    mi2damaged = Misc.process_to_hash(MutatedIsoform.setup(mutations2mutated_isoforms.values.flatten.compact.uniq, study.organism)){|mis| [false] * mis.length }
+    mi2damaged = Misc.process_to_hash(MutatedIsoform.setup(mutations2mutated_isoforms.values.flatten.compact.uniq, study.organism)){|mis| mis.damaged? }
+    #mi2damaged = Misc.process_to_hash(MutatedIsoform.setup(mutations2mutated_isoforms.values.flatten.compact.uniq, study.organism)){|mis| [false] * mis.length }
     mi2consequence = Misc.process_to_hash(MutatedIsoform.setup(mutations2mutated_isoforms.values.flatten.compact.uniq, study.organism)){|mis| mis.consequence }
 
     gene_mutations = study.knowledge_base.get_database(:mutation_genes, :source => "Ensembl Gene ID")
