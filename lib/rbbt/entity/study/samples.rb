@@ -72,7 +72,6 @@ module Study
     samples = Array === samples ? samples.flatten : [samples]
 
     studies = Study.studies.select{|study| Study.setup(study); (study.samples & samples).any? }
-    return nil if studies.length != 1
 
     studies.first
   end
