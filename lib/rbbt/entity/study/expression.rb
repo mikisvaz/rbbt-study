@@ -17,3 +17,8 @@ module StudyWorkflow
   end
 end
 
+module Study
+  def has_expression?
+    dir.matrices["gene_expression"].exists?
+  end
+end

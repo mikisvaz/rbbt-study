@@ -146,7 +146,7 @@ module Study
   end
 
   def matrix_file(name)
-    dir.matrices[name.to_s].find
+    dir.matrices[name.to_s].produce.find
   end
 
   def matrices
