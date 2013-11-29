@@ -29,7 +29,7 @@ module StudyWorkflow
       mutation_genes = Misc.process_to_hash(all_mutations){|all_mutations| all_mutations.genes}
       mutation_affected_genes = Misc.process_to_hash(all_mutations){|all_mutations| all_mutations.affected_genes}
       if all_mutations.length < 5000
-        log :damaged_genes, "Computing genes damaged genes"
+        log :damaged_genes, "Computing damaged genes"
         mutation_damaged_genes = Misc.process_to_hash(all_mutations){|all_mutations| all_mutations.damaged_genes}
       else
         mutation_damaged_genes = Misc.process_to_hash(all_mutations){|all_mutations| [nil] * all_mutations.length}
