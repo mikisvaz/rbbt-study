@@ -26,6 +26,7 @@ rbbt-study=/$PWD filter="*.rb *.rake Rakefile *.rdoc *.R *.sh *.js *.haml *.sass
      cnv=cnv{
       genes.rb
       samples.rb
+      knowledge_base.rb
      }
 
      expression.rb

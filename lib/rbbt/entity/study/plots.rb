@@ -51,8 +51,6 @@ pathway.enrichment = rbbt.ruby.substitutions(
 
     study = Study.setup('STUDY')
 
-    Log.severity = 0
-
     pathways = study.job(:mutation_pathway_enrichment, study, :baseline => :pathway_base_counts, :database => '#{database}', :fdr => false).run.select('p-value'){|pvalue| pvalue = pvalue.first.to_f if Array === pvalue; pvalue < 0.2}
     pathways.add_field 'Name' do |pathway, values|
         [pathway.name]
