@@ -10,6 +10,7 @@ Workflow.require_workflow "Genomics"
 require 'rbbt/entity/study'
 require 'rbbt/entity/study/knowledge_base'
 require 'rbbt/entity/study/samples'
+
 require 'rbbt/expression/matrix'
 
 module StudyWorkflow

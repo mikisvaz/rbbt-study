@@ -48,6 +48,12 @@ rbbt-study=/$PWD filter="*.rb *.rake Rakefile *.rdoc *.R *.sh *.js *.haml *.sass
    }
   }
  }
+ share=share{
+  R=R{
+   data.R
+   plots.R
+  }
+ }
  test=test {
   helper.rb
   test_rbbt-study.rb
