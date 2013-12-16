@@ -15,9 +15,11 @@ module Study
 
   self.study_registry[:sample_mutations] = Proc.new{|study,database|
     tsv = TSV.setup({}, :key_field => "Sample", :fields => ["Genomic Mutation"], :type => :flat, :namespace => study.organism)
+
     study.samples.select_by(:has_genotype?).each do |sample|
       tsv[sample] = sample.mutations
     end
+
     tsv
   }
 

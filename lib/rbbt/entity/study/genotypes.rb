@@ -28,7 +28,7 @@ module StudyWorkflow
 
     genes.each do |gene|
       mutations = study.knowledge_base.parents(:mutation_genes, gene).target
-      mutations = study.knowledge_base.subset(:sample_mutations, "Genomic Mutation" => mutations).source
+      mutations = study.knowledge_base.subset(:sample_mutations, "Genomic Mutation" => mutations, "Sample" => :all).source
       next if mutations.empty?
       matches = mutations.length
       exon_bases = gene2exon_size[gene]
