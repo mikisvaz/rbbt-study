@@ -13,6 +13,22 @@ module Study
     tsv
   }
 
+  self.study_registry[:mutation_affected_genes] = Proc.new{|study,database|
+    tsv = TSV.setup({}, :key_field => "Genomic Mutation", :fields => ["Ensembl Gene ID"], :type => :flat, :namespace => study.organism)
+    study.cohort.metagenotype.uniq.each do |mutation|
+      tsv[mutation] = mutation.affected_genes
+    end
+    tsv
+  }
+
+  self.study_registry[:mutation_damaged_genes] = Proc.new{|study,database|
+    tsv = TSV.setup({}, :key_field => "Genomic Mutation", :fields => ["Ensembl Gene ID"], :type => :flat, :namespace => study.organism)
+    study.cohort.metagenotype.uniq.each do |mutation|
+      tsv[mutation] = mutation.damaged_genes
+    end
+    tsv
+  }
+
   self.study_registry[:sample_mutations] = Proc.new{|study,database|
     tsv = TSV.setup({}, :key_field => "Sample", :fields => ["Genomic Mutation"], :type => :flat, :namespace => study.organism)
 
