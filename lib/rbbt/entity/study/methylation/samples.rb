@@ -1,10 +1,10 @@
 module Sample
   property :methylation => :array2single do
-    study.methylation_cohort
+    study.has_methylation? ? study.methylation_cohort : {}
   end
 
   property :has_methylation? => :array2single do
-    study.methylation_cohort.values_at(*self).collect{|methylation| not methylation.nil?}
+    study.has_methylation? ? study.methylation_cohort.values_at(*self).collect{|methylation| not methylation.nil?} : [false] * self.length
   end
   
   property :methylated => :single do

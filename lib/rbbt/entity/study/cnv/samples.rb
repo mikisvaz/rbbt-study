@@ -1,10 +1,10 @@
 module Sample
   property :cnvs => :array2single do
-    study.cnv_cohort
+    study.has_cnv? ? study.cnv_cohort : {}
   end
 
   property :has_cnv? => :array2single do
-    study.cnv_cohort.values_at(*self).collect{|cnvs| not cnvs.nil?}
+    study.has_cnv? ? cnvs.values_at(*self).collect{|cnvs| not cnvs.nil?} : [false] * self.length
   end
 
   property :gene_CN => :single do
