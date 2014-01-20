@@ -57,7 +57,7 @@ module Study
       values = sample.affected_genes.collect do |gene|
         mutations = gene_mutations[gene] & (sample_mutations[sample] || [])
 
-        if mutations.any?
+        if mutations and mutations.any?
           GenomicMutation.setup(mutations, "Mutations in #{ sample } over #{ gene }", study.organism, study.watson)
           junction = mutations.select{|mutation| mutations2exon_junction[mutation] }.any?
 
