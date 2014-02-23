@@ -6,8 +6,6 @@ require 'rbbt/entity/study/genotypes/genes'
 require 'rbbt/entity/study/genotypes/enrichment'
 require 'rbbt/entity/study/genotypes/knowledge_base'
 
-Workflow.require_workflow "NKIWorkflow"
-
 module StudyWorkflow
   helper :organism do
     study.metadata[:organism]
