@@ -11,7 +11,6 @@ require 'rbbt/entity/study'
 require 'rbbt/entity/study/knowledge_base'
 require 'rbbt/entity/study/samples'
 
-require 'rbbt/expression/matrix'
 
 module StudyWorkflow
   extend Workflow
@@ -168,6 +167,7 @@ module Study
     end
     samples = dir.matrices[type].samples.find if dir.matrices[type].samples.exists?
     samples = dir.samples.find if samples.nil? and dir.samples.exist?
+    raise "SYNC WITH GEO WORKFLOW"
     Matrix.new(data, identifiers, samples, format, organism)
   end
 end
