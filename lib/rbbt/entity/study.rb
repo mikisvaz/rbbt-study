@@ -167,7 +167,6 @@ module Study
     end
     samples = dir.matrices[type].samples.find if dir.matrices[type].samples.exists?
     samples = dir.samples.find if samples.nil? and dir.samples.exist?
-    raise "SYNC WITH GEO WORKFLOW"
-    Matrix.new(data, identifiers, samples, format, organism)
+    Matrix.new(data, samples, "count", format, organism, identifiers)
   end
 end
