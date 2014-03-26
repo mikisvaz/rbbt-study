@@ -66,7 +66,7 @@ module Study
         next unless relevant_mutations.include? mutation
         genes = []
         mis = mutation.mutated_isoforms
-        genes.concat mis.select_by(:nonsynonymous).transcript.gene unless mis.nil? or mis.empty?
+        genes.concat mis.select_by(:non_synonymous).transcript.gene unless mis.nil? or mis.empty?
         genes.concat mutation.transcripts_with_affected_splicing.gene
         genes.uniq.each{|gene| samples_with_gene_affected[gene] ||= []; samples_with_gene_affected[gene] << genotype.jobname}
       end
