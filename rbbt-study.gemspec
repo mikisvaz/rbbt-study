@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib"]
   s.authors = ["Miguel Vazquez"]
-  s.date = "2014-03-26"
+  s.date = "2014-03-31"
   s.description = "This gem add the study entity with suport for NGS, Microarray and other types of data"
   s.email = "miguel.vazquez@cnio.es"
   s.extra_rdoc_files = [
