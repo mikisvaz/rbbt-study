@@ -63,6 +63,7 @@ module Study
     samples_with_gene_affected = {}
     cohort.each do |genotype|
       genotype.each do |mutation|
+        next if mutation.nil?
         next unless relevant_mutations.include? mutation
         genes = []
         mis = mutation.mutated_isoforms
