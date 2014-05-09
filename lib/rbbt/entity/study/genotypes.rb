@@ -11,33 +11,33 @@ module StudyWorkflow
     study.metadata[:organism]
   end
 
-  task :binomial_significance => :tsv do
+  #task :binomial_significance => :tsv do
 
-    tsv = TSV.setup({}, :key_field => "Ensembl Gene ID", :fields => ["Matches", "Bases", "Frequency", "p.value"], :namespace => organism)
+  #  tsv = TSV.setup({}, :key_field => "Ensembl Gene ID", :fields => ["Matches", "Bases", "Frequency", "p.value"], :namespace => organism)
 
-    matches = study.knowledge_base.get_index(:mutation_genes).keys
-    genes = matches.collect{|m| m.partition("~").last}.uniq
-    all_mutations = matches.collect{|m| m.partition("~").first}.uniq
+  #  matches = study.knowledge_base.get_index(:mutation_genes).keys
+  #  genes = matches.collect{|m| m.partition("~").last}.uniq
+  #  all_mutations = matches.collect{|m| m.partition("~").first}.uniq
 
-    total_bases = Gene.gene_list_exon_bases(genes)
-    global_frequency = all_mutations.length.to_f / total_bases
+  #  total_bases = Gene.gene_list_exon_bases(genes)
+  #  global_frequency = all_mutations.length.to_f / total_bases
 
-    gene2exon_size = Misc.process_to_hash(genes){|genes| genes.collect{|gene| Gene.gene_list_exon_bases([gene]) }}
+  #  gene2exon_size = Misc.process_to_hash(genes){|genes| genes.collect{|gene| Gene.gene_list_exon_bases([gene]) }}
 
-    genes.each do |gene|
-      mutations = study.knowledge_base.parents(:mutation_genes, gene).target
-      mutations = study.knowledge_base.subset(:sample_mutations, "Genomic Mutation" => mutations, "Sample" => :all).source
-      next if mutations.empty?
-      matches = mutations.length
-      exon_bases = gene2exon_size[gene]
-      next if exon_bases == 0
-      frequency = matches.to_f / exon_bases
-      pvalue = RSRuby.instance.binom_test(matches, exon_bases, global_frequency, 'greater')["p.value"]
-      tsv[gene] = [matches, exon_bases, frequency, pvalue]
-    end
+  #  genes.each do |gene|
+  #    mutations = study.knowledge_base.parents(:mutation_genes, gene).target
+  #    mutations = study.knowledge_base.subset(:sample_mutations, "Genomic Mutation" => mutations, "Sample" => :all).source
+  #    next if mutations.empty?
+  #    matches = mutations.length
+  #    exon_bases = gene2exon_size[gene]
+  #    next if exon_bases == 0
+  #    frequency = matches.to_f / exon_bases
+  #    pvalue = RSRuby.instance.binom_test(matches, exon_bases, global_frequency, 'greater')["p.value"]
+  #    tsv[gene] = [matches, exon_bases, frequency, pvalue]
+  #  end
 
-    tsv
-  end
+  #  tsv
+  #end
 
   task :genotype_overview => :tsv do
     gene_overview = TSV.setup({}, 
