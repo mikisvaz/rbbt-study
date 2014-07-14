@@ -1,6 +1,6 @@
 module Study
   property :all_mutations do
-    cohort.metagenotype.tap{|o| o.jobname = "All mutations in #{ self }"; o.organism ||= organism; o.watson ||= watson }
+    cohort.metagenotype.sort.tap{|o| o.jobname = "All mutations in #{ self }"; o.organism ||= organism; o.watson ||= watson }
   end
 
   property :relevant_mutations do
