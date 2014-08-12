@@ -4,10 +4,10 @@ rbbt-study=/$PWD filter="*.rb *.rake Rakefile *.rdoc *.R *.sh *.js *.haml *.sass
  LICENSE.txt
  bin=bin {
  }
- lib=lib {
+ lib=lib_old {
   rbbt=rbbt{
    entity=entity{
-    study.rb
+    study.rb.old
     study=study{
      knowledge_base.rb
 
