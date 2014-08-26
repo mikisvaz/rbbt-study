@@ -37,7 +37,7 @@ rbbt.SE.gene.kegg.pathway <- function(genes){
 
         genes = [GENE_STR];
 
-        Gene.setup(genes, 'Associated Gene Name', 'Hsa/jun2011')
+        Gene.setup(genes, 'Associated Gene Name', Organism.default_code('Hsa'))
 
         pathways = genes.kegg_pathways.compact.flatten.uniq
 
